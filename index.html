@@ -530,7 +530,7 @@ const ACT = {};
 document.addEventListener('click', e => {
   /* hash links: navigate via location.hash so they also work inside sandboxed/srcdoc previews (where relative '#/x' links resolve against the parent URL and blank the page) */
   const a = e.target.closest('a[href^="#"]');
-  if (a && !a.dataset.a && !e.defaultPrevented && e.button === 0 && !e.ctrlKey && !e.metaKey) { e.preventDefault(); location.hash = a.getAttribute('href'); return; }
+  if (a && !a.dataset.a && !e.defaultPrevented && e.button === 0 && !e.ctrlKey && !e.metaKey) { e.preventDefault(); const h = a.getAttribute('href'); if (location.hash === h) { if (typeof render === 'function') render(); } else location.hash = h; return; }
   const t = e.target.closest('[data-a]');
   if (!t) return;
   const fn = ACT[t.dataset.a];
@@ -1336,7 +1336,7 @@ ACT.reportjob = async () => {
 const PD0 = () => ({ step: 1, svc: null, title: '', descr: '', area: (S.me && S.me.area && S.me.area !== 'عن بعد') ? S.me.area : '', when: 'اليوم', urgent: false, bmode: 'offers', bmin: 50, bmax: 100, pay: 'any', invite: null, done: null });
 let PD = PD0();
 route(/^\/post$/, async ctx => {
-  if (ctx.q.fresh) PD = PD0();
+  if (ctx.q.fresh || PD.done) PD = PD0();
   PICKQ = '';
   if (ctx.q.svc && svc(ctx.q.svc).slug === ctx.q.svc && S.services.some(s => s.slug === ctx.q.svc)) { PD.svc = ctx.q.svc; if (PD.step === 1) PD.step = 2; }
   if (ctx.q.invite) { PD.invite = { id: ctx.q.invite, name: ctx.q.name || 'العامل' }; if (ctx.q.s && !PD.svc) { PD.svc = ctx.q.s; PD.step = 2; } }
